@@ -14,8 +14,7 @@ public class Task {
     }
 
 
-    @Override
-    public String toString() {
+    public String print() {
         StringBuilder answersString = new StringBuilder();
         for (int i = 0; i < answers.size(); i++) {
             answersString.append(i + 1).append(".").append(answers.get(i)).append(" ");

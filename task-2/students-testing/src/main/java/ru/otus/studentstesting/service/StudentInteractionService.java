@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 @Service
-public class StudentInteractionService {
+public class StudentInteractionService implements IStudentInteractionService{
+    @Override
     public String getStudentName() {
         System.out.println("Your first and last name:");
         BufferedReader reader = new BufferedReader(
@@ -19,6 +20,7 @@ public class StudentInteractionService {
         }
     }
 
+    @Override
     public int getAnswer() {
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(System.in));

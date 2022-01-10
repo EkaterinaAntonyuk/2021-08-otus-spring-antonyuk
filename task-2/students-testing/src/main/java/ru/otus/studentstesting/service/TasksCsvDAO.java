@@ -14,26 +14,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class TasksReadingService {
+public class TasksCsvDAO implements ITasksDAO {
     private final String resourceName;
 
-    public TasksReadingService(@Value("${questions.filename}") String resourceName) {
+    public TasksCsvDAO(@Value("${questions.filename}") String resourceName) {
         this.resourceName = resourceName;
     }
 
+    @Override
     public List<Task> readQuestions() {
-        InputStream is = getFileFromResourceAsStream(resourceName);
-        Iterable<CSVRecord> records = fetch(is);
-        List<Task> tasks = new ArrayList<>();
-        for (CSVRecord csvRecord : records) {
-            List<String> answers = new ArrayList<>();
-            for (int i = 0; i < csvRecord.size() - 2; i++) {
-                answers.add(csvRecord.get(i + 2));
+        try (InputStream is = getFileFromResourceAsStream(resourceName)) {
+            Iterable<CSVRecord> records = fetch(is);
+            List<Task> tasks = new ArrayList<>();
+            for (CSVRecord csvRecord : records) {
+                List<String> answers = new ArrayList<>();
+                for (int i = 0; i < csvRecord.size() - 2; i++) {
+                    answers.add(csvRecord.get(i + 2));
+                }
+                Task task = new Task(csvRecord.get(0), csvRecord.get(1), answers);
+                tasks.add(task);
             }
-            Task task = new Task(csvRecord.get(0), csvRecord.get(1), answers);
-            tasks.add(task);
+            return tasks;
+        } catch (IOException e){
+            throw new RuntimeException("Failed to read records from resource", e);
         }
-        return tasks;
     }
 
     private InputStream getFileFromResourceAsStream(String resourceName) {
@@ -46,7 +50,7 @@ public class TasksReadingService {
 
     }
 
-    public static Iterable<CSVRecord> fetch(InputStream is) {
+    private Iterable<CSVRecord> fetch(InputStream is) {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             return CSVFormat.DEFAULT.parse(reader);

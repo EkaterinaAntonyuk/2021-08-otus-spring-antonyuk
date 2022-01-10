@@ -7,25 +7,26 @@ import ru.otus.studentstesting.model.Task;
 import java.util.List;
 
 @Service
-public class TestingService {
-    private final TasksReadingService tasksReadingService;
-    private final StudentInteractionService studentInteractionService;
+public class TestingService implements ITestingService {
+    private final ITasksDAO tasksDAO;
+    private final IStudentInteractionService studentInteractionService;
     private final int requiredCorrectAnswers;
 
-    public TestingService(TasksReadingService tasksReadingService,
+    public TestingService(TasksCsvDAO tasksDAO,
                           StudentInteractionService studentInteractionService,
                           @Value("${answers}") int requiredCorrectAnswers) {
-        this.tasksReadingService = tasksReadingService;
+        this.tasksDAO = tasksDAO;
         this.studentInteractionService = studentInteractionService;
         this.requiredCorrectAnswers = requiredCorrectAnswers;
     }
 
+    @Override
     public void test() {
         String name = studentInteractionService.getStudentName();
-        List<Task> tasks = tasksReadingService.readQuestions();
+        List<Task> tasks = tasksDAO.readQuestions();
         int correctAnswersCount = 0;
         for (Task task : tasks) {
-            System.out.println(task.toString());
+            System.out.println(task.print());
             if (task.checkAnswerIsCorrect(studentInteractionService.getAnswer())) {
                 correctAnswersCount++;
             }
